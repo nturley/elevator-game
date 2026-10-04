@@ -102,8 +102,10 @@ export function drawBuilding(
 
   const padTop = 28;
   const padBottom = 30;
-  const padLeft = 44;
+  // Shrink chrome on narrow canvases so the shafts keep their share.
+  const padLeft = Math.max(28, Math.min(44, width * 0.085));
   const padRight = 16;
+  const queueGap = Math.min(34, width * 0.08); // hall buttons + first figure
   const waitingAreaW = Math.min(150, width * 0.22);
   const shaftAreaW = width - padLeft - padRight - waitingAreaW;
   const shaftW = Math.min(84, shaftAreaW / E);
@@ -141,7 +143,7 @@ export function drawBuilding(
     // buttons would be in the building.
     if (snap) {
       const fs = snap.floors[f];
-      const hallX = padLeft + shaftW * E + 11;
+      const hallX = padLeft + shaftW * E + queueGap * 0.33;
       if (f < F - 1)
         drawTriangle(ctx, hallX, yMid - 8, "up", fs.upButtonLit);
       if (f > 0)
@@ -153,9 +155,9 @@ export function drawBuilding(
       const ids = snap.floors[f].waitingIds;
       const figH = Math.min(14, floorH * 0.42);
       const spacing = figH * 0.85 + 2;
-      const maxFigs = Math.max(3, Math.floor((waitingAreaW - 62) / spacing));
+      const maxFigs = Math.max(3, Math.floor((waitingAreaW - queueGap - 24) / spacing));
       const shown = Math.min(ids.length, maxFigs);
-      const x0 = padLeft + shaftW * E + 34;
+      const x0 = padLeft + shaftW * E + queueGap;
       for (let i = 0; i < shown; i++) {
         people.set(ids[i], {
           x: x0 + i * spacing + spacing / 2,
@@ -269,6 +271,9 @@ export function drawBuilding(
     if (riderCount > 0) {
       const color = loadColor(load);
       const feetYBase = carY + carH - 2;
+      // While the car travels, riders are glued to their slot (zero lag);
+      // only door-open moments get the glide/lerp treatment.
+      const snap = elev.state === "moving";
       if (carH > carW) {
         const perRow = 3;
         const rowCount = Math.ceil(riderCount / perRow);
@@ -282,7 +287,7 @@ export function drawBuilding(
           const spacing = Math.min(22, (carW - 8) / row.length);
           let px = carX + carW / 2 - (spacing * (row.length - 1)) / 2;
           for (const rider of row) {
-            people.set(rider.id, { x: px, y: feetY, figH, color });
+            people.set(rider.id, { x: px, y: feetY, figH, color, snap });
             px += spacing;
           }
         }
@@ -291,7 +296,7 @@ export function drawBuilding(
         const spacing = (carW - 6) / riderCount;
         let px = carX + carW / 2 - (spacing * (riderCount - 1)) / 2;
         for (const rider of elev.riders) {
-          people.set(rider.id, { x: px, y: feetYBase, figH, color });
+          people.set(rider.id, { x: px, y: feetYBase, figH, color, snap });
           px += spacing;
         }
       }

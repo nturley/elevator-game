@@ -39,7 +39,8 @@ body {
 .app-header {
   display: flex;
   align-items: center;
-  gap: 24px;
+  flex-wrap: wrap;
+  gap: 10px 24px;
   padding: 10px 16px;
   background: var(--panel);
   border-bottom: 1px solid var(--border);
@@ -298,7 +299,12 @@ body {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 10px;
-  overflow: hidden;
+  overflow: auto;
+}
+
+.canvas-sizer {
+  width: 100%;
+  height: 100%;
 }
 
 .sim-canvas {
@@ -400,4 +406,98 @@ body {
   font-size: 11.5px;
   color: var(--text-dim);
   line-height: 1.35;
+}
+
+/* ---------------- Responsive layout ---------------- */
+
+/* Narrow screens: stack the panes, simulation first. */
+@media (max-width: 860px) {
+  .app-main {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+    overflow-y: auto;
+  }
+
+  .sim-pane {
+    order: -1;
+  }
+
+  .editor-pane {
+    border-right: none;
+    border-top: 1px solid var(--border);
+    min-height: 420px;
+  }
+
+  .editor-wrap {
+    min-height: 320px;
+  }
+}
+
+/* Very narrow: tighten chrome so the sim keeps room. */
+@media (max-width: 480px) {
+  .app-header h1 {
+    font-size: 15px;
+    letter-spacing: 2px;
+  }
+
+  .level-tabs {
+    gap: 4px;
+  }
+
+  .level-tab {
+    width: 32px;
+    height: 32px;
+  }
+
+  .toolbar {
+    gap: 6px;
+    padding: 6px 8px;
+  }
+
+  .btn {
+    padding: 6px 10px;
+  }
+
+  .btn kbd {
+    display: none;
+  }
+
+  .metric {
+    min-width: 64px;
+  }
+
+  .api-panel {
+    grid-template-columns: 1fr;
+    max-height: 30vh;
+  }
+
+  .sim-pane {
+    padding: 10px 10px;
+    gap: 8px;
+  }
+}
+
+/* Mobile: let the whole page scroll instead of squishing panes internally. */
+@media (max-width: 860px) {
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
+  }
+
+  .app {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .app-main {
+    overflow: visible;
+  }
+
+  .sim-pane,
+  .editor-pane {
+    overflow: visible;
+    min-height: 0;
+  }
 }

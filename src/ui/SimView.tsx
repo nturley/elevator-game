@@ -63,7 +63,16 @@ export function SimView({ snapshotRef, level, animSpeed }: SimViewProps) {
     return () => cancelAnimationFrame(raf);
   }, [level, snapshotRef, animSpeed]);
 
-  return <canvas ref={canvasRef} className="sim-canvas" />;
+  return (
+    <div
+      className="canvas-sizer"
+      // Floors need breathing room: on short screens the wrap scrolls
+      // instead of squeezing the building into invisibility.
+      style={{ minHeight: level.floorCount * 26 + 58 }}
+    >
+      <canvas ref={canvasRef} className="sim-canvas" />
+    </div>
+  );
 }
 
 /** Small live stats readout; polls the snapshot ref a few times per second. */
